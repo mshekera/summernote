@@ -1,15 +1,20 @@
 define('summernote/core/livebind', function () {
   
   var livebind = (function () {
-    var result = {
-      process: function ($el, content, options) {
-        var tplName = 'tpl' + Math.floor(Math.random() * 1000);
-        can.mustache(tplName, content);
-        $el.html(can.view('#' + tplName, options.module));
-      }
+    var parse = function (content, options) {
+      var tplName = 'tpl' + Math.floor(Math.random() * 1000);
+      can.mustache(tplName, content);
+      return can.view('#' + tplName, options.module);
     };
 
-    return result;
+    var process = function ($el, content, options) {
+      $el.html(parse(content, options));
+    };
+
+    return {
+      parse: parse,
+      process: process
+    };
   })();
 
   return livebind;
