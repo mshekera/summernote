@@ -228,6 +228,11 @@ define('summernote/settings', function () {
           url: 'Image URL',
           remove: 'Remove Image'
         },
+        slider: {
+          slider: 'Slider',
+          insert: 'Insert Slider',
+          selectGallery: 'Select gallery:'
+        },
         link: {
           link: 'Link',
           insert: 'Insert Link',

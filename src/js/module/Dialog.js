@@ -73,6 +73,37 @@ define('summernote/module/Dialog', function () {
     };
 
     /**
+     * show slider dialog
+     *
+     * @param {jQuery} $editable
+     * @param {jQuery} $dialog
+     * @return {Promise}
+     */
+    this.showSliderDialog = function ($editable, $dialog) {
+      return $.Deferred(function (deferred) {
+        var $sliderDialog = $dialog.find('.note-slider-dialog');
+
+        var $sliderSelect = $dialog.find('.note-slider-select'),
+            $sliderBtn = $dialog.find('.note-slider-btn');
+
+        $sliderDialog.one('shown.bs.modal', function () {
+          $sliderBtn.click(function (event) {
+            event.preventDefault();
+
+            deferred.resolve($sliderSelect.val());
+
+            $sliderDialog.modal('hide');
+          });
+        }).one('hidden.bs.model', function () {
+          $sliderSelect.val(0);
+
+          $sliderBtn.off('click');
+        }).modal('show');
+
+      });
+    };
+
+    /**
      * Show video dialog and set event handlers on dialog controls.
      *
      * @param {jQuery} $dialog 

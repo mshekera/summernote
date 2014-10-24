@@ -1,6 +1,9 @@
 define([
-  'summernote/core/agent', 'summernote/core/dom', 'summernote/core/func'
-], function (agent, dom, func) {
+  'summernote/core/agent',
+  'summernote/core/dom',
+  'summernote/core/func',
+  'summernote/core/livebind'
+], function (agent, dom, func, livebind) {
   /**
    * renderer
    *
@@ -110,6 +113,13 @@ define([
         return tplIconButton('fa fa-picture-o icon-picture', {
           event: 'showImageDialog',
           title: lang.image.image,
+          hide: true
+        });
+      },
+      slider: function (lang) {
+        return tplIconButton('fa fa-files-o icon-slider', {
+          event: 'showSliderDialog',
+          title: lang.slider.slider,
           hide: true
         });
       },
@@ -435,6 +445,11 @@ define([
           event: 'imageShape',
           value: 'img-thumbnail'
         });
+        var sliderButton = tplIconButton('fa fa-files-o icon-slider', {
+          title: lang.image.shapeThumbnail,
+          event: 'imageShape',
+          value: 'img-slider'
+        });
         var noneButton = tplIconButton('fa fa-times icon-times', {
           title: lang.image.shapeNone,
           event: 'imageShape',
@@ -449,7 +464,7 @@ define([
 
         var content = '<div class="btn-group">' + fullButton + halfButton + quarterButton + '</div>' +
                       '<div class="btn-group">' + leftButton + rightButton + justifyButton + '</div>' +
-                      '<div class="btn-group">' + roundedButton + circleButton + thumbnailButton + noneButton + '</div>' +
+                      '<div class="btn-group">' + roundedButton + circleButton + thumbnailButton + sliderButton + noneButton + '</div>' +
                       '<div class="btn-group">' + removeButton + '</div>';
         return tplPopover('note-image-popover', content);
       };
@@ -586,6 +601,25 @@ define([
         return tplDialog('note-image-dialog', lang.image.insert, body, footer);
       };
 
+      var tplSliderDialog = function () {
+        var galleryOptions = '';
+
+        if (options.isAlive) {
+          galleryOptions = '{{#each gallery}}' +
+                           '<option value="{{_id}}">{{name}}</option>' +
+                           '{{/each}}';
+        }
+        var body =
+                   '<div class="note-group-select-from-files">' +
+                   '<h5>' + lang.slider.selectGallery + '</h5>' +
+                   '<select class="note-slider-select">' +
+                     galleryOptions +
+                   '</select>' +
+                   '</div>';
+        var footer = '<button href="#" type="button" class="btn btn-primary note-slider-btn">' + lang.slider.insert + '</button>';
+        return tplDialog('note-slider-dialog', lang.slider.insert, body, footer);
+      };
+
       var tplLinkDialog = function () {
         var body = '<div class="form-group">' +
                      '<label>' + lang.link.textToDisplay + '</label>' +
@@ -629,6 +663,7 @@ define([
 
       return '<div class="note-dialog">' +
                tplImageDialog() +
+               tplSliderDialog() +
                tplLinkDialog() +
                tplVideoDialog() +
                tplHelpDialog() +
@@ -780,7 +815,12 @@ define([
         $editable.attr('dir', options.direction);
       }
 
-      $editable.html(dom.html($holder) || dom.emptyPara);
+      //If isAlive - render editable area with canjs live bindings
+      if (options.isAlive) {
+        livebind.process($editable, dom.html($holder) || dom.emptyPara, options);
+      } else {
+        $editable.html(dom.html($holder) || dom.emptyPara);
+      }
 
       //031. create codable
       $('<textarea class="note-codable"></textarea>').prependTo($editor);
@@ -818,7 +858,16 @@ define([
       $(tplHandles()).prependTo($editor);
 
       //07. create Dialog
-      var $dialog = $(tplDialogs(langInfo, options)).prependTo($editor);
+      var $dialog;
+      if (options.isAlive) {
+        //note-dialog
+        var $wrap = $('<div></div>').prependTo($editor);
+        livebind.process($wrap, tplDialogs(langInfo, options), options);
+        $dialog = $wrap.children('.note-image-dialog');//editor.parent().find('.note-dialog');
+      } else {
+        $dialog = $(tplDialogs(langInfo, options)).prependTo($editor);
+      }
+
       $dialog.find('button.close, a.modal-close').click(function () {
         $(this).closest('.modal').modal('hide');
       });

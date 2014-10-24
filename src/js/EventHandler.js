@@ -126,6 +126,23 @@ define([
       /**
        * @param {Object} layoutInfo
        */
+      showSliderDialog: function (layoutInfo) {
+        var $dialog = layoutInfo.dialog(),
+            $editable = layoutInfo.editable();
+
+        editor.saveRange($editable);
+        dialog.showSliderDialog($editable, $dialog).then(function (data) {
+          editor.restoreRange($editable);
+
+          editor.insertSlider($editable, data);
+        }).fail(function () {
+          editor.restoreRange($editable);
+        });
+      },
+
+      /**
+       * @param {Object} layoutInfo
+       */
       showVideoDialog: function (layoutInfo) {
         var $dialog = layoutInfo.dialog(),
             $editable = layoutInfo.editable(),

@@ -200,6 +200,20 @@ define([
     };
 
     /**
+     * insert slider block
+     *
+     * @param {jQuery} $editable
+     * @param {Number} index
+     */
+    this.insertSlider = function ($editable, index) {
+      var template = '<slider images="{gallery}" index="' + index + '"></slider>';
+      var $slider = can.mustache(template);
+
+      range.create().insertNode($slider());
+      afterCommand($editable);
+    };
+
+    /**
      * insert video
      * @param {jQuery} $editable
      * @param {String} sUrl

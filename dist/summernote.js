@@ -6,7 +6,7 @@
  * Copyright 2013-2014 Alan Hong. and other contributors
  * summernote may be freely distributed under the MIT license./
  *
- * Date: 2014-10-11T01:18Z
+ * Date: 2014-10-24T14:54Z
  */
 (function (factory) {
   /* global define */
@@ -1487,6 +1487,11 @@
           url: 'Image URL',
           remove: 'Remove Image'
         },
+        slider: {
+          slider: 'Slider',
+          insert: 'Insert Slider',
+          selectGallery: 'Select gallery:'
+        },
         link: {
           link: 'Link',
           insert: 'Insert Link',
@@ -2845,6 +2850,20 @@
     };
 
     /**
+     * insert slider block
+     *
+     * @param {jQuery} $editable
+     * @param {Number} index
+     */
+    this.insertSlider = function ($editable, index) {
+      var template = '<slider images="{gallery}" index="' + index + '"></slider>';
+      var $slider = can.mustache(template);
+
+      range.create().insertNode($slider());
+      afterCommand($editable);
+    };
+
+    /**
      * insert video
      * @param {jQuery} $editable
      * @param {String} sUrl
@@ -3581,6 +3600,37 @@
     };
 
     /**
+     * show slider dialog
+     *
+     * @param {jQuery} $editable
+     * @param {jQuery} $dialog
+     * @return {Promise}
+     */
+    this.showSliderDialog = function ($editable, $dialog) {
+      return $.Deferred(function (deferred) {
+        var $sliderDialog = $dialog.find('.note-slider-dialog');
+
+        var $sliderSelect = $dialog.find('.note-slider-select'),
+            $sliderBtn = $dialog.find('.note-slider-btn');
+
+        $sliderDialog.one('shown.bs.modal', function () {
+          $sliderBtn.click(function (event) {
+            event.preventDefault();
+
+            deferred.resolve($sliderSelect.val());
+
+            $sliderDialog.modal('hide');
+          });
+        }).one('hidden.bs.model', function () {
+          $sliderSelect.val(0);
+
+          $sliderBtn.off('click');
+        }).modal('show');
+
+      });
+    };
+
+    /**
      * Show video dialog and set event handlers on dialog controls.
      *
      * @param {jQuery} $dialog 
@@ -3811,6 +3861,23 @@
             // array of files
             insertImages($editable, data);
           }
+        }).fail(function () {
+          editor.restoreRange($editable);
+        });
+      },
+
+      /**
+       * @param {Object} layoutInfo
+       */
+      showSliderDialog: function (layoutInfo) {
+        var $dialog = layoutInfo.dialog(),
+            $editable = layoutInfo.editable();
+
+        editor.saveRange($editable);
+        dialog.showSliderDialog($editable, $dialog).then(function (data) {
+          editor.restoreRange($editable);
+
+          editor.insertSlider($editable, data);
         }).fail(function () {
           editor.restoreRange($editable);
         });
@@ -4390,6 +4457,19 @@
     };
   };
 
+  
+  var livebind = (function () {
+    var result = {
+      process: function ($el, content, options) {
+        var tplName = 'tpl' + Math.floor(Math.random() * 1000);
+        can.mustache(tplName, content);
+        $el.html(can.view('#' + tplName, options.module));
+      }
+    };
+
+    return result;
+  })();
+
   /**
    * renderer
    *
@@ -4499,6 +4579,13 @@
         return tplIconButton('fa fa-picture-o icon-picture', {
           event: 'showImageDialog',
           title: lang.image.image,
+          hide: true
+        });
+      },
+      slider: function (lang) {
+        return tplIconButton('fa fa-files-o icon-slider', {
+          event: 'showSliderDialog',
+          title: lang.slider.slider,
           hide: true
         });
       },
@@ -4824,6 +4911,11 @@
           event: 'imageShape',
           value: 'img-thumbnail'
         });
+        var sliderButton = tplIconButton('fa fa-files-o icon-slider', {
+          title: lang.image.shapeThumbnail,
+          event: 'imageShape',
+          value: 'img-slider'
+        });
         var noneButton = tplIconButton('fa fa-times icon-times', {
           title: lang.image.shapeNone,
           event: 'imageShape',
@@ -4838,7 +4930,7 @@
 
         var content = '<div class="btn-group">' + fullButton + halfButton + quarterButton + '</div>' +
                       '<div class="btn-group">' + leftButton + rightButton + justifyButton + '</div>' +
-                      '<div class="btn-group">' + roundedButton + circleButton + thumbnailButton + noneButton + '</div>' +
+                      '<div class="btn-group">' + roundedButton + circleButton + thumbnailButton + sliderButton + noneButton + '</div>' +
                       '<div class="btn-group">' + removeButton + '</div>';
         return tplPopover('note-image-popover', content);
       };
@@ -4975,6 +5067,25 @@
         return tplDialog('note-image-dialog', lang.image.insert, body, footer);
       };
 
+      var tplSliderDialog = function () {
+        var galleryOptions = '';
+
+        if (options.isAlive) {
+          galleryOptions = '{{#each gallery}}' +
+                           '<option value="{{_id}}">{{name}}</option>' +
+                           '{{/each}}';
+        }
+        var body =
+                   '<div class="note-group-select-from-files">' +
+                   '<h5>' + lang.slider.selectGallery + '</h5>' +
+                   '<select class="note-slider-select">' +
+                     galleryOptions +
+                   '</select>' +
+                   '</div>';
+        var footer = '<button href="#" type="button" class="btn btn-primary note-slider-btn">' + lang.slider.insert + '</button>';
+        return tplDialog('note-slider-dialog', lang.slider.insert, body, footer);
+      };
+
       var tplLinkDialog = function () {
         var body = '<div class="form-group">' +
                      '<label>' + lang.link.textToDisplay + '</label>' +
@@ -5018,6 +5129,7 @@
 
       return '<div class="note-dialog">' +
                tplImageDialog() +
+               tplSliderDialog() +
                tplLinkDialog() +
                tplVideoDialog() +
                tplHelpDialog() +
@@ -5169,7 +5281,12 @@
         $editable.attr('dir', options.direction);
       }
 
-      $editable.html(dom.html($holder) || dom.emptyPara);
+      //If isAlive - render editable area with canjs live bindings
+      if (options.isAlive) {
+        livebind.process($editable, dom.html($holder) || dom.emptyPara, options);
+      } else {
+        $editable.html(dom.html($holder) || dom.emptyPara);
+      }
 
       //031. create codable
       $('<textarea class="note-codable"></textarea>').prependTo($editor);
@@ -5207,7 +5324,16 @@
       $(tplHandles()).prependTo($editor);
 
       //07. create Dialog
-      var $dialog = $(tplDialogs(langInfo, options)).prependTo($editor);
+      var $dialog;
+      if (options.isAlive) {
+        //note-dialog
+        var $wrap = $('<div></div>').prependTo($editor);
+        livebind.process($wrap, tplDialogs(langInfo, options), options);
+        $dialog = $wrap.children('.note-image-dialog');//editor.parent().find('.note-dialog');
+      } else {
+        $dialog = $(tplDialogs(langInfo, options)).prependTo($editor);
+      }
+
       $dialog.find('button.close, a.modal-close').click(function () {
         $(this).closest('.modal').modal('hide');
       });
@@ -5316,6 +5442,9 @@
     summernote: function (options) {
       // extend default options
       options = $.extend({}, $.summernote.options, options);
+
+      // define if we should use live binding in custom components and edit area
+      options.isAlive = options.module() instanceof can.Map;
 
       this.each(function (idx, elHolder) {
         var $holder = $(elHolder);

@@ -27,6 +27,9 @@ define([
       // extend default options
       options = $.extend({}, $.summernote.options, options);
 
+      // define if we should use live binding in custom components and edit area
+      options.isAlive = options.module() instanceof can.Map;
+
       this.each(function (idx, elHolder) {
         var $holder = $(elHolder);
 
