@@ -6,7 +6,7 @@
  * Copyright 2013-2014 Alan Hong. and other contributors
  * summernote may be freely distributed under the MIT license./
  *
- * Date: 2014-10-24T14:54Z
+ * Date: 2014-10-24T18:45Z
  */
 (function (factory) {
   /* global define */
@@ -2365,6 +2365,24 @@
     };
   })();
 
+  
+  var livebind = (function () {
+    var parse = function (content, options) {
+      var tplName = 'tpl' + Math.floor(Math.random() * 1000);
+      can.mustache(tplName, content);
+      return can.view('#' + tplName, options.module);
+    };
+
+    var process = function ($el, content, options) {
+      $el.html(parse(content, options));
+    };
+
+    return {
+      parse: parse,
+      process: process
+    };
+  })();
+
 
   var Typing = function () {
 
@@ -2855,11 +2873,13 @@
      * @param {jQuery} $editable
      * @param {Number} index
      */
-    this.insertSlider = function ($editable, index) {
-      var template = '<slider images="{gallery}" index="' + index + '"></slider>';
-      var $slider = can.mustache(template);
+    this.insertSlider = function ($editable, index, options) {
+      var template = '<slider style="width: 200px; height: 200px;"' +
+                     ' images="{gallery}" index="' + index + '"></slider>';
 
-      range.create().insertNode($slider());
+      var $slider = livebind.parse(template, options);
+
+      range.create().insertNode($slider);
       afterCommand($editable);
     };
 
@@ -3877,7 +3897,7 @@
         dialog.showSliderDialog($editable, $dialog).then(function (data) {
           editor.restoreRange($editable);
 
-          editor.insertSlider($editable, data);
+          editor.insertSlider($editable, data, layoutInfo.editor().data('options'));
         }).fail(function () {
           editor.restoreRange($editable);
         });
@@ -4456,19 +4476,6 @@
       }
     };
   };
-
-  
-  var livebind = (function () {
-    var result = {
-      process: function ($el, content, options) {
-        var tplName = 'tpl' + Math.floor(Math.random() * 1000);
-        can.mustache(tplName, content);
-        $el.html(can.view('#' + tplName, options.module));
-      }
-    };
-
-    return result;
-  })();
 
   /**
    * renderer
