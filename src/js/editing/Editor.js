@@ -5,11 +5,12 @@ define([
   'summernote/core/dom',
   'summernote/core/range',
   'summernote/core/async',
+  'summernote/core/livebind',
   'summernote/editing/Style',
   'summernote/editing/Typing',
   'summernote/editing/Table',
   'summernote/editing/Bullet'
-], function (agent, func, list, dom, range, async,
+], function (agent, func, list, dom, range, async, livebind,
              Style, Typing, Table, Bullet) {
   /**
    * Editor
@@ -205,11 +206,13 @@ define([
      * @param {jQuery} $editable
      * @param {Number} index
      */
-    this.insertSlider = function ($editable, index) {
-      var template = '<slider images="{gallery}" index="' + index + '"></slider>';
-      var $slider = can.mustache(template);
+    this.insertSlider = function ($editable, index, options) {
+      var template = '<slider style="width: 200px; height: 200px;"' +
+                     ' images="{gallery}" index="' + index + '"></slider>';
 
-      range.create().insertNode($slider());
+      var $slider = livebind.parse(template, options);
+
+      range.create().insertNode($slider);
       afterCommand($editable);
     };
 

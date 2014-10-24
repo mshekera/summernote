@@ -134,7 +134,7 @@ define([
         dialog.showSliderDialog($editable, $dialog).then(function (data) {
           editor.restoreRange($editable);
 
-          editor.insertSlider($editable, data);
+          editor.insertSlider($editable, data, layoutInfo.editor().data('options'));
         }).fail(function () {
           editor.restoreRange($editable);
         });
