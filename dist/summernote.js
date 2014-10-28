@@ -6,7 +6,7 @@
  * Copyright 2013-2014 Alan Hong. and other contributors
  * summernote may be freely distributed under the MIT license./
  *
- * Date: 2014-10-28T18:32Z
+ * Date: 2014-10-28T18:55Z
  */
 (function (factory) {
   /* global define */
@@ -2365,6 +2365,24 @@
     };
   })();
 
+  
+  var livebind = (function () {
+    var parse = function (content, options) {
+      var tplName = 'tpl' + Math.floor(Math.random() * 1000);
+      can.mustache(tplName, content);
+      return can.view('#' + tplName, options.module);
+    };
+
+    var process = function ($el, content, options) {
+      $el.html(parse(content, options));
+    };
+
+    return {
+      parse: parse,
+      process: process
+    };
+  })();
+
 
   var Typing = function () {
 
@@ -2859,7 +2877,8 @@
       var template = '<slider style="width: 200px; height: 200px;"' +
                      ' images="{gallery}" index="' + index + '"></slider>';
 
-      var $slider = can.view.mustache(template, options.module);
+
+      var $slider = livebind.parse(template, options);
 
       range.create().insertNode($slider);
       afterCommand($editable);
@@ -5248,8 +5267,6 @@
      * @param {Object} options
      */
     this.createLayoutByFrame = function ($holder, options) {
-      var html;
-
       //01. create Editor
       var $editor = $('<div class="note-editor"></div>');
       if (options.width) {
@@ -5274,8 +5291,7 @@
 
       //If isAlive - render editable area with canjs live bindings
       if (options.isAlive) {
-        html = can.view.mustache(dom.html($holder) || dom.emptyPara, options.module);
-        $editable.html(html);
+        livebind.process($editable, dom.html($holder) || dom.emptyPara, options);
       } else {
         $editable.html(dom.html($holder) || dom.emptyPara);
       }
@@ -5320,8 +5336,7 @@
       if (options.isAlive) {
         //note-dialog
         var $wrap = $('<div></div>').prependTo($editor);
-        html = can.view.mustache(tplDialogs(langInfo, options), options.module);
-        $wrap.html(html);
+        livebind.process($wrap, tplDialogs(langInfo, options), options);
         $dialog = $wrap.children('.note-image-dialog');
       } else {
         $dialog = $(tplDialogs(langInfo, options)).prependTo($editor);
