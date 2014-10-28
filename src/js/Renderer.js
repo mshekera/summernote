@@ -1,9 +1,8 @@
 define([
   'summernote/core/agent',
   'summernote/core/dom',
-  'summernote/core/func',
-  'summernote/core/livebind'
-], function (agent, dom, func, livebind) {
+  'summernote/core/func'
+], function (agent, dom, func) {
   /**
    * renderer
    *
@@ -817,7 +816,8 @@ define([
 
       //If isAlive - render editable area with canjs live bindings
       if (options.isAlive) {
-        livebind.process($editable, dom.html($holder) || dom.emptyPara, options);
+        var html = can.view.mustache(dom.html($holder) || dom.emptyPara, options.module)
+        $editable.html(html);
       } else {
         $editable.html(dom.html($holder) || dom.emptyPara);
       }
@@ -862,8 +862,9 @@ define([
       if (options.isAlive) {
         //note-dialog
         var $wrap = $('<div></div>').prependTo($editor);
-        livebind.process($wrap, tplDialogs(langInfo, options), options);
-        $dialog = $wrap.children('.note-image-dialog');//editor.parent().find('.note-dialog');
+        var html = can.view.mustache(tplDialogs(langInfo, options), options.module)
+        $wrap.html(html);
+        $dialog = $wrap.children('.note-image-dialog');
       } else {
         $dialog = $(tplDialogs(langInfo, options)).prependTo($editor);
       }
