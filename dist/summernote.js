@@ -6,7 +6,7 @@
  * Copyright 2013-2014 Alan Hong. and other contributors
  * summernote may be freely distributed under the MIT license./
  *
- * Date: 2014-10-24T18:45Z
+ * Date: 2014-10-28T16:53Z
  */
 (function (factory) {
   /* global define */
@@ -5451,7 +5451,7 @@
       options = $.extend({}, $.summernote.options, options);
 
       // define if we should use live binding in custom components and edit area
-      options.isAlive = options.module() instanceof can.Map;
+      options.isAlive = options.module ? options.module() instanceof can.Map : false;
 
       this.each(function (idx, elHolder) {
         var $holder = $(elHolder);
