@@ -792,6 +792,8 @@ define([
      * @param {Object} options
      */
     this.createLayoutByFrame = function ($holder, options) {
+      var html;
+
       //01. create Editor
       var $editor = $('<div class="note-editor"></div>');
       if (options.width) {
@@ -816,7 +818,7 @@ define([
 
       //If isAlive - render editable area with canjs live bindings
       if (options.isAlive) {
-        var html = can.view.mustache(dom.html($holder) || dom.emptyPara, options.module)
+        html = can.view.mustache(dom.html($holder) || dom.emptyPara, options.module);
         $editable.html(html);
       } else {
         $editable.html(dom.html($holder) || dom.emptyPara);
@@ -862,7 +864,7 @@ define([
       if (options.isAlive) {
         //note-dialog
         var $wrap = $('<div></div>').prependTo($editor);
-        var html = can.view.mustache(tplDialogs(langInfo, options), options.module)
+        html = can.view.mustache(tplDialogs(langInfo, options), options.module);
         $wrap.html(html);
         $dialog = $wrap.children('.note-image-dialog');
       } else {
