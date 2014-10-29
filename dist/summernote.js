@@ -6,7 +6,7 @@
  * Copyright 2013-2014 Alan Hong. and other contributors
  * summernote may be freely distributed under the MIT license./
  *
- * Date: 2014-10-28T18:55Z
+ * Date: 2014-10-29T16:59Z
  */
 (function (factory) {
   /* global define */
@@ -1329,7 +1329,7 @@
       ],
 
       // style tag
-      styleTags: ['p', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+      styleTags: ['p', 'blockquote', 'blockquote2', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
 
       // default fontName
       defaultFontName: 'Helvetica Neue',
@@ -1518,6 +1518,7 @@
           style: 'Style',
           normal: 'Normal',
           blockquote: 'Quote',
+          blockquote2: 'Double quotes',
           pre: 'Code',
           h1: 'Header 1',
           h2: 'Header 2',
@@ -1542,7 +1543,10 @@
           left: 'Align left',
           center: 'Align center',
           right: 'Align right',
-          justify: 'Justify full'
+          justify: 'Justify full',
+          top: 'Vertical align top',
+          middle: 'Vertical align middle',
+          bottom: 'Vertical align bottom'
         },
         color: {
           recent: 'Recent Color',
@@ -2775,6 +2779,22 @@
         };
       })(commands[idx]);
     }
+
+    this.justifyTop = function ($editable, options) {
+      var node = $(window.getSelection().focusNode.parentNode);
+      node.css('vertical-align', 'top');
+    };
+
+    this.justifyMiddle = function ($editable, options) {
+      var node = $(window.getSelection().focusNode.parentNode);
+      node.css('vertical-align', 'middle');
+    };
+
+    this.justifyBottom = function ($editable, options) {
+      var node = $(window.getSelection().focusNode.parentNode);
+      node.css('vertical-align', 'bottom');
+    };
+
     /* jshint ignore:end */
 
     /**
@@ -2877,7 +2897,6 @@
       var template = '<slider style="width: 200px; height: 200px;"' +
                      ' images="{gallery}" index="' + index + '"></slider>';
 
-
       var $slider = livebind.parse(template, options);
 
       range.create().insertNode($slider);
@@ -2958,7 +2977,14 @@
      */
     this.formatBlock = function ($editable, tagName) {
       tagName = agent.isMSIE ? '<' + tagName + '>' : tagName;
-      document.execCommand('FormatBlock', false, tagName);
+      var res = document.execCommand('FormatBlock', false, tagName);
+      if (!res && tagName) {
+        document.execCommand('FormatBlock', false, agent.isMSIE ? '<p>' : 'p');
+        var node = $(window.getSelection().focusNode.parentNode),
+            data = node.html(),
+            ins = '<' + tagName + '><p>' + data + '</p></' + tagName + '>';
+        node.replaceWith(ins);
+      }
       afterCommand($editable);
     };
 
@@ -4536,6 +4562,13 @@
       return tplButton(label, options);
     };
 
+    var tplIconButtonVertical = function (iconClassName, options) {
+      var label = '<span class="' + iconClassName + '"></span>',
+          myOptions = $.extend(true, {}, options);
+      myOptions.className += ' rotate90';
+      return tplButton(label, myOptions);
+    };
+
     /**
      * bootstrap popover template
      *
@@ -4786,6 +4819,18 @@
           title: lang.paragraph.indent,
           event: 'indent'
         });
+        var vTopButton = tplIconButtonVertical('fa fa-align-left icon-align-left', {
+          title: lang.paragraph.top,
+          event: 'justifyTop'
+        });
+        var vMiddleButton = tplIconButtonVertical('fa fa-align-center icon-align-center', {
+          title: lang.paragraph.middle,
+          event: 'justifyMiddle'
+        });
+        var vBottomButton = tplIconButtonVertical('fa fa-align-right icon-align-right', {
+          title: lang.paragraph.bottom,
+          event: 'justifyBottom'
+        });
 
         var dropdown = '<div class="dropdown-menu">' +
                          '<div class="note-align btn-group">' +
@@ -4793,6 +4838,9 @@
                          '</div>' +
                          '<div class="note-list btn-group">' +
                            indentButton + outdentButton +
+                         '</div>' +
+                         '<div class="note-list btn-group">' +
+                           vTopButton + vMiddleButton + vBottomButton +
                          '</div>' +
                        '</div>';
 
