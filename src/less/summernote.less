@@ -120,6 +120,38 @@
   blockquote {
     border-left-color: #2ca7e0;
   }
+
+  blockquote2 {
+    position: relative;
+    display: block;
+    padding-left: 2em;
+    &:before {
+      content: "\f10d" !important;
+      display: block;
+      position: absolute;
+      font-size: 2em;
+      top: -0.4em;
+      left: -0.2em;
+      color: #2ba8de;
+      font-family: FontAwesome;
+    }
+  }
+
+  .rotate90 {
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    transform: rotate(90deg);
+
+    -webkit-transfrom-origin: 50% 50%;
+    -moz-transfrom-origin: 50% 50%;
+    -ms-transfrom-origin: 50% 50%;
+    -o-transfrom-origin: 50% 50%;
+    transfrom-origin: 50% 50%;
+
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+  }
 }
 
 /* Air Mode Layout
