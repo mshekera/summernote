@@ -62,6 +62,13 @@ define([
       return tplButton(label, options);
     };
 
+    var tplIconButtonVertical = function (iconClassName, options) {
+      var label = '<span class="' + iconClassName + '"></span>',
+          myOptions = $.extend(true, {}, options);
+      myOptions.className += ' rotate90';
+      return tplButton(label, myOptions);
+    };
+
     /**
      * bootstrap popover template
      *
@@ -312,6 +319,18 @@ define([
           title: lang.paragraph.indent,
           event: 'indent'
         });
+        var vTopButton = tplIconButtonVertical('fa fa-align-left icon-align-left', {
+          title: lang.paragraph.top,
+          event: 'justifyTop'
+        });
+        var vMiddleButton = tplIconButtonVertical('fa fa-align-center icon-align-center', {
+          title: lang.paragraph.middle,
+          event: 'justifyMiddle'
+        });
+        var vBottomButton = tplIconButtonVertical('fa fa-align-right icon-align-right', {
+          title: lang.paragraph.bottom,
+          event: 'justifyBottom'
+        });
 
         var dropdown = '<div class="dropdown-menu">' +
                          '<div class="note-align btn-group">' +
@@ -319,6 +338,9 @@ define([
                          '</div>' +
                          '<div class="note-list btn-group">' +
                            indentButton + outdentButton +
+                         '</div>' +
+                         '<div class="note-list btn-group">' +
+                           vTopButton + vMiddleButton + vBottomButton +
                          '</div>' +
                        '</div>';
 

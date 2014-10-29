@@ -70,7 +70,7 @@ define('summernote/settings', function () {
       ],
 
       // style tag
-      styleTags: ['p', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+      styleTags: ['p', 'blockquote', 'blockquote2', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
 
       // default fontName
       defaultFontName: 'Helvetica Neue',
@@ -259,6 +259,7 @@ define('summernote/settings', function () {
           style: 'Style',
           normal: 'Normal',
           blockquote: 'Quote',
+          blockquote2: 'Double quotes',
           pre: 'Code',
           h1: 'Header 1',
           h2: 'Header 2',
@@ -283,7 +284,10 @@ define('summernote/settings', function () {
           left: 'Align left',
           center: 'Align center',
           right: 'Align right',
-          justify: 'Justify full'
+          justify: 'Justify full',
+          top: 'Vertical align top',
+          middle: 'Vertical align middle',
+          bottom: 'Vertical align bottom'
         },
         color: {
           recent: 'Recent Color',

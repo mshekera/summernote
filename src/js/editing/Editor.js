@@ -108,6 +108,22 @@ define([
         };
       })(commands[idx]);
     }
+
+    this.justifyTop = function ($editable, options) {
+      var node = $(window.getSelection().focusNode.parentNode);
+      node.css('vertical-align', 'top');
+    };
+
+    this.justifyMiddle = function ($editable, options) {
+      var node = $(window.getSelection().focusNode.parentNode);
+      node.css('vertical-align', 'middle');
+    };
+
+    this.justifyBottom = function ($editable, options) {
+      var node = $(window.getSelection().focusNode.parentNode);
+      node.css('vertical-align', 'bottom');
+    };
+
     /* jshint ignore:end */
 
     /**
@@ -210,7 +226,6 @@ define([
       var template = '<slider style="width: 200px; height: 200px;"' +
                      ' images="{gallery}" index="' + index + '"></slider>';
 
-
       var $slider = livebind.parse(template, options);
 
       range.create().insertNode($slider);
@@ -291,7 +306,14 @@ define([
      */
     this.formatBlock = function ($editable, tagName) {
       tagName = agent.isMSIE ? '<' + tagName + '>' : tagName;
-      document.execCommand('FormatBlock', false, tagName);
+      var res = document.execCommand('FormatBlock', false, tagName);
+      if (!res && tagName) {
+        document.execCommand('FormatBlock', false, agent.isMSIE ? '<p>' : 'p');
+        var node = $(window.getSelection().focusNode.parentNode),
+            data = node.html(),
+            ins = '<' + tagName + '><p>' + data + '</p></' + tagName + '>';
+        node.replaceWith(ins);
+      }
       afterCommand($editable);
     };
 
