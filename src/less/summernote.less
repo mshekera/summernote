@@ -10,6 +10,7 @@
 .note-editor {
   border: 1px solid @border-color;
   position: relative;
+  max-width: 520px;
 
   /* dropzone */
   @dropzone-color: lightskyblue;
@@ -51,7 +52,8 @@
   &.fullscreen {
     position: fixed;
     top: 0;
-    left: 0;
+    left: 50%;
+    transform: translate(-50%);
     width: 100%;
     z-index: 1050; /* bs3 modal-backdrop: 1030, bs2: 1040 */
     .note-editable {
