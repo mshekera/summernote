@@ -73,13 +73,11 @@ define('summernote/settings', function () {
       styleTags: ['p', 'blockquote', 'blockquote2', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
 
       // default fontName
-      defaultFontName: 'Helvetica Neue',
+      defaultFontName: 'PT_Sans_Regular',
 
       // fontName
       fontNames: [
-        'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New',
-        'Helvetica Neue', 'Impact', 'Lucida Grande',
-        'Tahoma', 'Times New Roman', 'Verdana'
+        'PT_Sans_Regular'
       ],
 
       // pallete colors(n x n)
@@ -95,7 +93,7 @@ define('summernote/settings', function () {
       ],
 
       // fontSize
-      fontSizes: ['8', '9', '10', '11', '12', '14', '18', '24', '36'],
+      fontSizes: ['8', '9', '10', '11', '12', '14', '16', '18', '24', '36'],
 
       // lineHeight
       lineHeights: ['1.0', '1.2', '1.4', '1.5', '1.6', '1.8', '2.0', '3.0'],
