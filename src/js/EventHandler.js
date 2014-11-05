@@ -56,7 +56,7 @@ define([
      * @param {jQuery} $editable
      * @param {File[]} files
      */
-    var insertImages = function ($editable, files) {
+    var insertImages = function ($editable, files, alt, title) {
       var callbacks = $editable.data('callbacks');
 
       // If onImageUpload options setted
@@ -67,7 +67,7 @@ define([
         $.each(files, function (idx, file) {
           var filename = file.name;
           async.readFileAsDataURL(file).then(function (sDataURL) {
-            editor.insertImage($editable, sDataURL, filename);
+            editor.insertImage($editable, sDataURL, filename, alt, title);
           }).fail(function () {
             if (callbacks.onImageUploadError) {
               callbacks.onImageUploadError();
@@ -108,15 +108,15 @@ define([
             $editable = layoutInfo.editable();
 
         editor.saveRange($editable);
-        dialog.showImageDialog($editable, $dialog).then(function (data) {
+        dialog.showImageDialog($editable, $dialog).then(function (data, alt, title) {
           editor.restoreRange($editable);
 
           if (typeof data === 'string') {
             // image url
-            editor.insertImage($editable, data);
+            editor.insertImage($editable, data, undefined, alt, title);
           } else {
             // array of files
-            insertImages($editable, data);
+            insertImages($editable, data, alt, title);
           }
         }).fail(function () {
           editor.restoreRange($editable);

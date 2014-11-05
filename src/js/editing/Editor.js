@@ -200,11 +200,14 @@ define([
      * @param {jQuery} $editable
      * @param {String} sUrl
      */
-    this.insertImage = function ($editable, sUrl, filename) {
+    this.insertImage = function ($editable, sUrl, filename, alt, title) {
       async.createImage(sUrl, filename).then(function ($image) {
         $image.css({
           display: '',
           width: Math.min($editable.width(), $image.width())
+        }).attr({
+          alt: alt,
+          title: title
         });
         range.create().insertNode($image[0]);
         afterCommand($editable);

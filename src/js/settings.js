@@ -224,6 +224,8 @@ define('summernote/settings', function () {
           dragImageHere: 'Drag an image here',
           selectFromFiles: 'Select from files',
           url: 'Image URL',
+          alt: 'Image alternate text',
+          title: 'Image title (shown on hover)',
           remove: 'Remove Image'
         },
         slider: {

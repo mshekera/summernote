@@ -6,7 +6,7 @@
  * Copyright 2013-2014 Alan Hong. and other contributors
  * summernote may be freely distributed under the MIT license./
  *
- * Date: 2014-10-29T16:59Z
+ * Date: 2014-11-05T19:55Z
  */
 (function (factory) {
   /* global define */
@@ -1332,13 +1332,11 @@
       styleTags: ['p', 'blockquote', 'blockquote2', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
 
       // default fontName
-      defaultFontName: 'Helvetica Neue',
+      defaultFontName: 'PT_Sans_Regular',
 
       // fontName
       fontNames: [
-        'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New',
-        'Helvetica Neue', 'Impact', 'Lucida Grande',
-        'Tahoma', 'Times New Roman', 'Verdana'
+        'PT_Sans_Regular'
       ],
 
       // pallete colors(n x n)
@@ -1354,7 +1352,7 @@
       ],
 
       // fontSize
-      fontSizes: ['8', '9', '10', '11', '12', '14', '18', '24', '36'],
+      fontSizes: ['8', '9', '10', '11', '12', '14', '16', '18', '24', '36'],
 
       // lineHeight
       lineHeights: ['1.0', '1.2', '1.4', '1.5', '1.6', '1.8', '2.0', '3.0'],
@@ -1485,6 +1483,8 @@
           dragImageHere: 'Drag an image here',
           selectFromFiles: 'Select from files',
           url: 'Image URL',
+          alt: 'Image alternate text',
+          title: 'Image title (shown on hover)',
           remove: 'Remove Image'
         },
         slider: {
@@ -2871,11 +2871,14 @@
      * @param {jQuery} $editable
      * @param {String} sUrl
      */
-    this.insertImage = function ($editable, sUrl, filename) {
+    this.insertImage = function ($editable, sUrl, filename, alt, title) {
       async.createImage(sUrl, filename).then(function ($image) {
         $image.css({
           display: '',
           width: Math.min($editable.width(), $image.width())
+        }).attr({
+          alt: alt,
+          title: title
         });
         range.create().insertNode($image[0]);
         afterCommand($editable);
@@ -3604,13 +3607,15 @@
 
         var $imageInput = $dialog.find('.note-image-input'),
             $imageUrl = $dialog.find('.note-image-url'),
+            $imageAlt = $dialog.find('.note-image-alt'),
+            $imageTitle = $dialog.find('.note-image-title'),
             $imageBtn = $dialog.find('.note-image-btn');
 
         $imageDialog.one('shown.bs.modal', function () {
           // Cloning imageInput to clear element.
           $imageInput.replaceWith($imageInput.clone()
             .on('change', function () {
-              deferred.resolve(this.files);
+              deferred.resolve(this.files, $imageAlt.val(), $imageTitle.val());
               $imageDialog.modal('hide');
             })
             .val('')
@@ -3619,7 +3624,7 @@
           $imageBtn.click(function (event) {
             event.preventDefault();
 
-            deferred.resolve($imageUrl.val());
+            deferred.resolve($imageUrl.val(), $imageAlt.val(), $imageTitle.val());
             $imageDialog.modal('hide');
           });
 
@@ -3846,7 +3851,7 @@
      * @param {jQuery} $editable
      * @param {File[]} files
      */
-    var insertImages = function ($editable, files) {
+    var insertImages = function ($editable, files, alt, title) {
       var callbacks = $editable.data('callbacks');
 
       // If onImageUpload options setted
@@ -3857,7 +3862,7 @@
         $.each(files, function (idx, file) {
           var filename = file.name;
           async.readFileAsDataURL(file).then(function (sDataURL) {
-            editor.insertImage($editable, sDataURL, filename);
+            editor.insertImage($editable, sDataURL, filename, alt, title);
           }).fail(function () {
             if (callbacks.onImageUploadError) {
               callbacks.onImageUploadError();
@@ -3898,15 +3903,15 @@
             $editable = layoutInfo.editable();
 
         editor.saveRange($editable);
-        dialog.showImageDialog($editable, $dialog).then(function (data) {
+        dialog.showImageDialog($editable, $dialog).then(function (data, alt, title) {
           editor.restoreRange($editable);
 
           if (typeof data === 'string') {
             // image url
-            editor.insertImage($editable, data);
+            editor.insertImage($editable, data, undefined, alt, title);
           } else {
             // array of files
-            insertImages($editable, data);
+            insertImages($editable, data, alt, title);
           }
         }).fail(function () {
           editor.restoreRange($editable);
@@ -5118,7 +5123,11 @@
                    '<input class="note-image-input" type="file" name="files" accept="image/*" />' +
                    '</div>' +
                    '<h5>' + lang.image.url + '</h5>' +
-                   '<input class="note-image-url form-control span12" type="text" />';
+                   '<input class="note-image-url form-control span12" type="text" />' +
+                   '<h5>' + lang.image.alt + '</h5>' +
+                   '<input class="note-image-alt form-control span12" type="text" />' +
+                   '<h5>' + lang.image.title + '</h5>' +
+                   '<input class="note-image-title form-control span12" type="text" />';
         var footer = '<button href="#" class="btn btn-primary note-image-btn disabled" disabled>' + lang.image.insert + '</button>';
         return tplDialog('note-image-dialog', lang.image.insert, body, footer);
       };
