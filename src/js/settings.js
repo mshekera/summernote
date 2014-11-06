@@ -77,7 +77,7 @@ define('summernote/settings', function () {
 
       // fontName
       fontNames: [
-        'PT_Sans_Regular'
+        'PT_Sans_Regular', 'Helvetica Neue'
       ],
 
       // pallete colors(n x n)
