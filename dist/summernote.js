@@ -6,7 +6,7 @@
  * Copyright 2013-2014 Alan Hong. and other contributors
  * summernote may be freely distributed under the MIT license./
  *
- * Date: 2014-11-05T19:55Z
+ * Date: 2014-11-06T13:40Z
  */
 (function (factory) {
   /* global define */
@@ -84,21 +84,23 @@
    * @param {String} fontName
    * @return {Boolean}
    */
-  var isFontInstalled = function (fontName) {
-    var testFontName = fontName === 'Comic Sans MS' ? 'Courier New' : 'Comic Sans MS';
-    var $tester = $('<div>').css({
-      position: 'absolute',
-      left: '-9999px',
-      top: '-9999px',
-      fontSize: '200px'
-    }).text('mmmmmmmmmwwwwwww').appendTo(document.body);
+  var isFontInstalled = function () {
+  // var isFontInstalled = function (fontName) {
+    // var testFontName = fontName === 'Comic Sans MS' ? 'Courier New' : 'Comic Sans MS';
+    // var $tester = $('<div>').css({
+    //   position: 'absolute',
+    //   left: '-9999px',
+    //   top: '-9999px',
+    //   fontSize: '200px'
+    // }).text('mmmmmmmmmwwwwwww').appendTo(document.body);
 
-    var originalWidth = $tester.css('fontFamily', testFontName).width();
-    var width = $tester.css('fontFamily', fontName + ',' + testFontName).width();
+    // var originalWidth = $tester.css('fontFamily', testFontName).width();
+    // var width = $tester.css('fontFamily', fontName + ',' + testFontName).width();
 
-    $tester.remove();
+    // $tester.remove();
 
-    return originalWidth !== width;
+    // return originalWidth !== width;
+    return true;
   };
 
   /**
@@ -1336,7 +1338,7 @@
 
       // fontName
       fontNames: [
-        'PT_Sans_Regular'
+        'PT_Sans_Regular', 'Helvetica Neue', 'Helvetica, serif', 'Helvetica'
       ],
 
       // pallete colors(n x n)
